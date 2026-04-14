@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
 from . import models, schemas
 
-def get_all(db: Session):
-    return db.query(models.Product).all()
+def get_all(db: Session, skip: int = 0, limit: int = 10, search: str = ""):
+    query = db.query(models.Product)
+    
+    if search:
+        query = query.filter(models.Product.name.ilike(f"%{search}%"))
+    
+    return query.offset(skip).limit(limit).all()
 
 def get_one(db: Session, product_id: int):
     return db.query(models.Product).filter(models.Product.id == product_id).first()
